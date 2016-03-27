@@ -150,11 +150,9 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return array
 	 */
 	public function get_collection_params() {
-		$params                       = parent::get_collection_params();
-		$params['context']['default'] = 'view';
-		$params['context']['enum']    = array( 'view' );
-
-		return $params;
+		return array(
+			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+		);
 	}
 
 	/**
