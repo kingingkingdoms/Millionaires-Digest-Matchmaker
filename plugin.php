@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP REST API - Plugins Endpoint
+ * Plugin Name: WP REST API - Plugin Endpoints
  * Description: Plugin endpoints for the WP REST API
  * Author: Paul Gibbs
  * Author URI: http://byotos.com/
@@ -17,6 +17,9 @@
 function plugins_rest_api_init() {
 	if ( class_exists( 'WP_REST_Controller' ) && ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/lib/class-wp-rest-plugins-controller.php';
+
+		$controller = new WP_REST_Plugins_Controller();
+		$controller->register_routes();
 	}
 }
 add_action( 'rest_api_init', 'plugins_rest_api_init', 11 );
