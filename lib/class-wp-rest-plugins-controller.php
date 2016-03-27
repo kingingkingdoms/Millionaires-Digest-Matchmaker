@@ -176,11 +176,11 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			foreach ( $_plugins as $id => $plugin ) {
 				$plugin['id'] = $id;
 
-				$data = $this->prepare_item_for_response( $plugin, $request );
 				if ( $type === 'dropins' || $type === 'mustuse' ) {
-					$data['status'] = $type;
+					$plugin['status'] = $type;
 				}
 
+				$data = $this->prepare_item_for_response( $plugin, $request );
 				$plugins[] = $this->prepare_response_for_collection( $data );
 			}
 		}
@@ -225,7 +225,6 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			'name'            => wp_strip_all_tags( $plugin['Name'] ),
 			'link'            => wp_strip_all_tags( $plugin['PluginURI'] ),
 			'network-only'    => (bool) $plugin['Network'],
-			'status'          => '',  //$plugin[''],
 			'textdomain'      => wp_strip_all_tags( $plugin['TextDomain'] ),
 			'textdomain-path' => wp_strip_all_tags( $plugin['DomainPath'] ),
 			'version'         => wp_strip_all_tags( $plugin['Version'] ),
