@@ -252,7 +252,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * Check if a given request has access to get information about a specific plugin.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
-	 * @return WP_Error|boolean
+	 * @return bool
 	 */
 	public function get_item_permissions_check( $request ) {
 		return $this->get_items_permissions_check( $request );
@@ -262,28 +262,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * Check if a given request has access to plugin information.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
-	 * @return WP_Error|boolean
+	 * @return bool
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( ! current_user_can('activate_plugins') ) {
-			return false;
-		}
-
-		if ( is_multisite() && ! current_user_can( 'manage_network_plugins' ) ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check if we can read a plugin's information.
-	 *
-	 * @param array $plugin
-	 * @return boolean Can we read it?
-	 */
-	public function check_read_permission( $plugin ) {
-		if ( ! current_user_can('activate_plugins') ) {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return false;
 		}
 
