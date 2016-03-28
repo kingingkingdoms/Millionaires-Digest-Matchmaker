@@ -176,7 +176,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			foreach ( $_plugins as $id => $plugin ) {
 				$plugin['id'] = urlencode( $id );
 
-				if ( $type === 'dropins' || $type === 'mustuse' ) {
+				if ( $type === 'dropin' || $type === 'mustuse' ) {
 					$plugin['status'] = $type;
 				}
 
