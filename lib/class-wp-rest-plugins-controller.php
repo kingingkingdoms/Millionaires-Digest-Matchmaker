@@ -35,6 +35,24 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
+
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[-_%\.\w]+)/', array(
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_item' ),
+				'permission_callback' => array( $this, 'get_item_permissions_check' ),
+				'args'                => array(
+					'context'          => $this->get_context_param( array( 'default' => 'view' ) ),
+				),
+			),
+			/*array(
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => array( $this, 'update_item' ),
+				'permission_callback' => array( $this, 'update_item_permissions_check' ),
+				'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+			),*/
+			'schema' => array( $this, 'get_public_item_schema' ),
+		) );
 	}
 
 	/**
@@ -59,33 +77,33 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				'id' => array(
 					'description' => __( 'A unique alphanumeric identifier for the object.' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 
 				'name' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The name of the object.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'description' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The description of the object.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'version' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The version of the object (x.y.z).' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'link' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'URL to the website of the object.' ),
 					'format'      => 'uri',
 					'readonly'    => true,
@@ -93,14 +111,14 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				),
 
 				'author' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The name of the author(s) of the object.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'author-url' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'URL to the author(s) of the object.' ),
 					'format'      => 'uri',
 					'readonly'    => true,
@@ -108,28 +126,28 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				),
 
 				'textdomain' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The name of the gettext text domain for the object, used for translations.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'textdomain-path' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'The relative path to the location containing the gettext translation files for the object.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'network-only' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'Whether the object can only be activated on a per-network basis.' ),
 					'readonly'    => true,
 					'type'        => 'boolean',
 				),
 
 				'status' => array(
-					'context'     => array( 'view' ),
+					'context'     => array( 'view', 'edit' ),
 					'description' => __( 'A named status for the object.' ),
 					'enum'        => array( 'dropin', 'inactive', 'mustuse', 'network', 'site', ),
 					'readonly'    => true,
@@ -197,13 +215,40 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Request|WP_Error Meta object data on success, WP_Error otherwise
 	 */
 	public function get_item( $request ) {
-		$mid = (int) $request['title'];
+		$request['id'] = urldecode( $request['id'] );
+		$all_plugins = array(
+			'all'     => apply_filters( 'all_plugins', get_plugins() ),
+			'dropin'  => get_dropins(),
+			'mustuse' => get_mu_plugins(),
+		);
 
-		if ( empty( $meta ) ) {
-			return new WP_Error( 'rest_meta_invalid_id', __( 'Invalid meta id.' ), array( 'status' => 404 ) );
+		$requested_plugin = array();
+
+		foreach ( $all_plugins as $type => $_plugins ) {
+			foreach ( $_plugins as $id => $plugin ) {
+
+				// Check if requested ID matches a plugin.
+				if ( urldecode( $request['id'] ) !== $id ) {
+					continue;
+				}
+
+				// Build response data.
+				$plugin['id'] = urlencode( $id );
+
+				if ( $type === 'dropin' || $type === 'mustuse' ) {
+					$plugin['status'] = $type;
+				}
+
+				$requested_plugin = $this->prepare_item_for_response( $plugin, $request );
+				break;
+			}
 		}
 
-		return $this->prepare_item_for_response( $meta, $request );
+		if ( ! $requested_plugin ) {
+			return new WP_Error( 'rest_meta_invalid_id', __( 'Invalid plugin id.' ), array( 'status' => 404 ) );
+		}
+
+		return $requested_plugin;
 	}
 
 	/**
@@ -283,12 +328,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return array Links for the given plugin.
 	 */
 	protected function prepare_links( $post ) {
-		$base = sprintf( '/%s/%s', $this->namespace, $this->rest_base );
+		$base = sprintf( '/%s/%s/', $this->namespace, $this->rest_base );
 
 		// Entity meta
 		$links = array(
 			'self' => array(
-				'href'   => rest_url( trailingslashit( $base ) . wp_strip_all_tags( $post['id'] ) ),
+				'href'   => rest_url( trailingslashit( $base . wp_strip_all_tags( $post['id'] ) ) ),
 			),
 			'collection' => array(
 				'href'   => rest_url( $base ),
