@@ -36,7 +36,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
 
-		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[-_%\.\w]+)/', array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[-_%\.\w]+)', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_item' ),
@@ -192,7 +192,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		foreach ( $all_plugins as $type => $_plugins ) {
 			foreach ( $_plugins as $id => $plugin ) {
-				$plugin['id'] = urlencode( $id );
+				$plugin['id'] = $this->get_plugin_id( $id );
 
 				if ( $type === 'dropin' || $type === 'mustuse' ) {
 					$plugin['status'] = $type;
@@ -212,10 +212,9 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request
-	 * @return WP_REST_Request|WP_Error Meta object data on success, WP_Error otherwise
+	 * @return WP_REST_Request|WP_Error Plugin object data on success, WP_Error otherwise.
 	 */
 	public function get_item( $request ) {
-		$request['id'] = urldecode( $request['id'] );
 		$all_plugins = array(
 			'all'     => apply_filters( 'all_plugins', get_plugins() ),
 			'dropin'  => get_dropins(),
@@ -228,12 +227,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			foreach ( $_plugins as $id => $plugin ) {
 
 				// Check if requested ID matches a plugin.
-				if ( urldecode( $request['id'] ) !== $id ) {
+				if ( $request['id'] !== $this->get_plugin_id( $id ) ) {
 					continue;
 				}
 
 				// Build response data.
-				$plugin['id'] = urlencode( $id );
+				$plugin['id'] = $this->get_plugin_id( $id );
 
 				if ( $type === 'dropin' || $type === 'mustuse' ) {
 					$plugin['status'] = $type;
@@ -333,7 +332,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		// Entity meta
 		$links = array(
 			'self' => array(
-				'href'   => rest_url( trailingslashit( $base . wp_strip_all_tags( $post['id'] ) ) ),
+				'href'   => rest_url( $base . wp_strip_all_tags( $post['id'] ) ),
 			),
 			'collection' => array(
 				'href'   => rest_url( $base ),
@@ -341,5 +340,17 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		);
 
 		return $links;
+	}
+
+	/**
+	 * Convert the supplied plugin path/file name into an ID.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $plugin
+	 * @return string
+	 */
+	protected function get_plugin_id( $plugin ) {
+		return urlencode( str_replace( '.php', '', $plugin ) );
 	}
 }
