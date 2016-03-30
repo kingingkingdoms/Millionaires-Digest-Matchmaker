@@ -244,7 +244,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		}
 
 		if ( ! $requested_plugin ) {
-			return new WP_Error( 'rest_meta_invalid_id', __( 'Invalid plugin id.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_plugin_invalid_id', __( 'Invalid plugin ID.' ), array( 'status' => 404 ) );
 		}
 
 		return $requested_plugin;
@@ -258,7 +258,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @param stdClass $plugin Plugin data.
 	 * @param WP_REST_Request $request
 	 * @param boolean $is_raw Is the value field still serialized? (False indicates the value has been unserialized)
-	 * @return WP_REST_Response|WP_Error Meta object data on success, WP_Error otherwise
+	 * @return WP_REST_Response|WP_Error Plugin object data on success, WP_Error otherwise
 	 */
 	public function prepare_item_for_response( $plugin, $request, $is_raw = false ) {
 		$data = array(
@@ -286,7 +286,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		 *
 		 * Allows modification of the plugin value right before it is returned.
 		 *
-		 * @param array           $response Key value array of meta data: id, key, value.
+		 * @param array           $response
 		 * @param WP_REST_Request $request  Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_plugin_value', $response, $request );
@@ -294,6 +294,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 	/**
 	 * Check if a given request has access to get information about a specific plugin.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return bool
@@ -304,6 +306,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 	/**
 	 * Check if a given request has access to plugin information.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return bool
@@ -323,13 +327,15 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare links for the request.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param array $plugin Plugin data.
 	 * @return array Links for the given plugin.
 	 */
 	protected function prepare_links( $post ) {
 		$base = sprintf( '/%s/%s/', $this->namespace, $this->rest_base );
 
-		// Entity meta
+		// Entity meta.
 		$links = array(
 			'self' => array(
 				'href'   => rest_url( $base . wp_strip_all_tags( $post['id'] ) ),
