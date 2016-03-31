@@ -75,10 +75,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 			'properties' => array(
 				'id' => array(
-					'description' => __( 'A unique alphanumeric identifier for the object.' ),
-					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
+					'description' => __( 'A unique alphanumeric identifier for the object.' ),
 					'readonly'    => true,
+					'type'        => 'string',
 				),
 
 				'name' => array(
@@ -146,13 +146,21 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'type'        => 'boolean',
 				),
 
-				'status' => array(
+				'type' => array(
 					'context'     => array( 'view', 'edit' ),
-					'description' => __( 'A named status for the object.' ),
-					'enum'        => array( 'dropin', 'inactive', 'mustuse', 'network', 'site', ),
+					'description' => __( 'Activation type of the object.' ),
+					'enum'        => array( 'dropin', 'mustuse', 'plugin', ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
+
+				'is-active' => array(
+					'context'     => array( 'view', 'edit' ),
+					'description' => __( 'Whether the object has been activated in WordPress or not.' ),
+					'enum'        => array( 'dropin', 'mustuse', 'plugin', ),
+					'readonly'    => true,
+					'type'        => 'boolean',
+				)
 			)
 		);
 
@@ -179,28 +187,16 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request
-	 * @return WP_REST_Reques List of plugin object data.
+	 * @return WP_REST_Requesy List of plugin object data.
 	 */
 	public function get_items( $request ) {
-		$all_plugins = array(
-			'all'     => apply_filters( 'all_plugins', get_plugins() ),
-			'dropin'  => get_dropins(),
-			'mustuse' => get_mu_plugins(),
-		);
+		$plugins = $this->get_plugins();
+		$retval  = array();
 
-		$plugins = array();
-
-		foreach ( $all_plugins as $type => $_plugins ) {
-			foreach ( $_plugins as $id => $plugin ) {
-				$plugin['id'] = $this->get_plugin_id( $id );
-
-				if ( $type === 'dropin' || $type === 'mustuse' ) {
-					$plugin['status'] = $type;
-				}
-
-				$data = $this->prepare_item_for_response( $plugin, $request );
-				$plugins[] = $this->prepare_response_for_collection( $data );
-			}
+		foreach ( $plugins as $plugin ) {
+			$plugins[] = $this->prepare_response_for_collection(
+				$this->prepare_item_for_response( $plugin, $request )
+			);
 		}
 
 		return rest_ensure_response( $plugins );
@@ -215,39 +211,45 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Request|WP_Error Plugin object data on success, WP_Error otherwise.
 	 */
 	public function get_item( $request ) {
+		$plugins = $this->get_plugins();
+		if ( ! isset( $plugins[ $request['id'] ] ) ) {
+			return new WP_Error( 'rest_plugin_invalid_id', __( 'Invalid plugin ID.' ), array( 'status' => 404 ) );
+		}
+
+		return $this->prepare_item_for_response( $plugins[ $request['id'] ], $request );
+	}
+
+	/**
+	 * Get all plugin data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array
+	 */
+	public function get_plugins() {
 		$all_plugins = array(
 			'all'     => apply_filters( 'all_plugins', get_plugins() ),
 			'dropin'  => get_dropins(),
 			'mustuse' => get_mu_plugins(),
 		);
 
-		$requested_plugin = array();
+		$plugins = array();
 
 		foreach ( $all_plugins as $type => $_plugins ) {
 			foreach ( $_plugins as $id => $plugin ) {
-
-				// Check if requested ID matches a plugin.
-				if ( $request['id'] !== $this->get_plugin_id( $id ) ) {
-					continue;
-				}
-
-				// Build response data.
-				$plugin['id'] = $this->get_plugin_id( $id );
+				$plugin['id']        = $this->get_plugin_id( $id );
+				$plugin['type']      = 'plugin';
+				$plugin['is-active'] = is_plugin_active( $id );
 
 				if ( $type === 'dropin' || $type === 'mustuse' ) {
-					$plugin['status'] = $type;
+					$plugin['type'] = $type;
 				}
 
-				$requested_plugin = $this->prepare_item_for_response( $plugin, $request );
-				break;
+				$plugins[ $this->get_plugin_id( $id ) ] = $plugin;
 			}
 		}
 
-		if ( ! $requested_plugin ) {
-			return new WP_Error( 'rest_plugin_invalid_id', __( 'Invalid plugin ID.' ), array( 'status' => 404 ) );
-		}
-
-		return $requested_plugin;
+		return $plugins;
 	}
 
 	/**
@@ -266,11 +268,13 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			'author-url'      => wp_strip_all_tags( $plugin['AuthorURI'] ),
 			'description'     => wp_strip_all_tags( $plugin['Description'] ),
 			'id'              => wp_strip_all_tags( $plugin['id'] ),
+			'is-active'       => (bool) $plugin['is-active'],
 			'name'            => wp_strip_all_tags( $plugin['Name'] ),
 			'link'            => wp_strip_all_tags( $plugin['PluginURI'] ),
 			'network-only'    => (bool) $plugin['Network'],
 			'textdomain'      => wp_strip_all_tags( $plugin['TextDomain'] ),
 			'textdomain-path' => wp_strip_all_tags( $plugin['DomainPath'] ),
+			'type'            => $plugin['type'],
 			'version'         => wp_strip_all_tags( $plugin['Version'] ),
 		);
 
