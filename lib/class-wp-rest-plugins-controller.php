@@ -104,7 +104,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 				'link' => array(
 					'context'     => array( 'view', 'edit' ),
-					'description' => __( 'URL to the website of the object.' ),
+					'description' => __( "URL to the object website's." ),
 					'format'      => 'uri',
 					'readonly'    => true,
 					'type'        => 'string',
@@ -119,7 +119,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 				'author-url' => array(
 					'context'     => array( 'view', 'edit' ),
-					'description' => __( 'URL to the author(s) of the object.' ),
+					'description' => __( 'URL to the object author(s) website.' ),
 					'format'      => 'uri',
 					'readonly'    => true,
 					'type'        => 'string',
