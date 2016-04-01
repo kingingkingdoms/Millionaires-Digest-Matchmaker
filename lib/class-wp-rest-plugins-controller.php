@@ -265,12 +265,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $plugin, $request, $is_raw = false ) {
 		$data = array(
 			'author'          => wp_strip_all_tags( $plugin['Author'] ),
-			'author-url'      => wp_strip_all_tags( $plugin['AuthorURI'] ),
+			'author-link'     => esc_url_raw( $plugin['AuthorURI'] ),
 			'description'     => wp_strip_all_tags( $plugin['Description'] ),
 			'id'              => wp_strip_all_tags( $plugin['id'] ),
 			'is-active'       => (bool) $plugin['is-active'],
+			'link'            => esc_url_raw( $plugin['PluginURI'] ),
 			'name'            => wp_strip_all_tags( $plugin['Name'] ),
-			'link'            => wp_strip_all_tags( $plugin['PluginURI'] ),
 			'network-only'    => (bool) $plugin['Network'],
 			'textdomain'      => wp_strip_all_tags( $plugin['TextDomain'] ),
 			'textdomain-path' => wp_strip_all_tags( $plugin['DomainPath'] ),
