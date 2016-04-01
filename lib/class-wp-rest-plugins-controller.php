@@ -45,12 +45,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 				),
 			),
-			/*array(
+			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'update_item' ),
 				'permission_callback' => array( $this, 'update_item_permissions_check' ),
 				'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
-			),*/
+			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
 	}
@@ -157,7 +157,6 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				'is-active' => array(
 					'context'     => array( 'edit' ),
 					'description' => __( 'Whether the object has been activated in WordPress or not.' ),
-					'enum'        => array( 'dropin', 'mustuse', 'plugin', ),
 					'readonly'    => true,
 					'type'        => 'boolean',
 				)
