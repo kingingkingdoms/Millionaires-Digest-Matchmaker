@@ -194,12 +194,12 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$retval  = array();
 
 		foreach ( $plugins as $plugin ) {
-			$plugins[] = $this->prepare_response_for_collection(
+			$retval[] = $this->prepare_response_for_collection(
 				$this->prepare_item_for_response( $plugin, $request )
 			);
 		}
 
-		return rest_ensure_response( $plugins );
+		return rest_ensure_response( $retval );
 	}
 
 	/**
