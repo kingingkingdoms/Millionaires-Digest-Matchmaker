@@ -42,7 +42,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				'callback'            => array( $this, 'get_item' ),
 				'permission_callback' => array( $this, 'get_item_permissions_check' ),
 				'args'                => array(
-					'context'          => $this->get_context_param( array( 'default' => 'view' ) ),
+					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 				),
 			),
 			/*array(
@@ -259,8 +259,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 *
 	 * @param stdClass $plugin Plugin data.
 	 * @param WP_REST_Request $request
-	 * @param boolean $is_raw Is the value field still serialized? (False indicates the value has been unserialized)
-	 * @return WP_REST_Response|WP_Error Plugin object data on success, WP_Error otherwise
+	 * @param boolean $is_raw Optional, not used. Defaults to false.
+	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $plugin, $request, $is_raw = false ) {
 		$data = array(
@@ -314,7 +314,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
-	 * @return bool
+	 * @return WP_Error|bool
 	 */
 	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
