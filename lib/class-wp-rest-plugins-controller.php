@@ -166,7 +166,6 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		return $schema;
 	}
 
-
 	/**
 	 * Get the query params for collections of plugins.
 	 *
@@ -218,6 +217,11 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		return $this->prepare_item_for_response( $plugins[ $request['id'] ], $request );
 	}
 
+
+	/*
+	 * Methods relating to "get" endpoints.
+	 */
+
 	/**
 	 * Get all plugin data.
 	 *
@@ -249,6 +253,48 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		}
 
 		return $plugins;
+	}
+
+	/**
+	 * Check if a given request has access to get information about a specific plugin.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return bool
+	 */
+	public function get_item_permissions_check( $request ) {
+		return $this->get_items_permissions_check( $request );
+	}
+
+	/**
+	 * Check if a given request has access to plugin information.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|bool
+	 */
+	public function get_items_permissions_check( $request ) {
+		$can_read = true;
+
+		if ( $request['context'] === 'edit' ) {
+			if ( is_multisite() ) {
+				$can_read = current_user_can( 'manage_network_plugins' );
+			} else {
+				$can_read = current_user_can( 'activate_plugins' );
+			}
+		}
+
+		if ( ! $can_read ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you cannot view this resource with edit context.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return $can_read;
 	}
 
 	/**
@@ -296,45 +342,15 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to get information about a specific plugin.
+	 * Convert the supplied plugin path/file name into an ID.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
-	 * @return bool
+	 * @param string $plugin
+	 * @return string
 	 */
-	public function get_item_permissions_check( $request ) {
-		return $this->get_items_permissions_check( $request );
-	}
-
-	/**
-	 * Check if a given request has access to plugin information.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param WP_REST_Request $request Full data about the request.
-	 * @return WP_Error|bool
-	 */
-	public function get_items_permissions_check( $request ) {
-		$can_read = true;
-
-		if ( $request['context'] === 'edit' ) {
-			if ( is_multisite() ) {
-				$can_read = current_user_can( 'manage_network_plugins' );
-			} else {
-				$can_read = current_user_can( 'activate_plugins' );
-			}
-		}
-
-		if ( ! $can_read ) {
-			return new WP_Error(
-				'rest_forbidden_context',
-				__( 'Sorry, you cannot view this resource with edit context.' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		return $can_read;
+	protected function get_plugin_id( $plugin ) {
+		return urlencode( str_replace( '.php', '', $plugin ) );
 	}
 
 	/**
@@ -359,17 +375,5 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		);
 
 		return $links;
-	}
-
-	/**
-	 * Convert the supplied plugin path/file name into an ID.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $plugin
-	 * @return string
-	 */
-	protected function get_plugin_id( $plugin ) {
-		return urlencode( str_replace( '.php', '', $plugin ) );
 	}
 }
