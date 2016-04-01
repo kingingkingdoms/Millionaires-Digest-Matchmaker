@@ -232,7 +232,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		$plugin = urldecode( $request['id'] ) . '.php';
 
-		if ( ! empty( $request['status'] ) ) {
+		if ( ! empty( $request['status'] ) && $plugins[ $request['id'] ]['type'] === 'plugin' ) {
 			$request['status'] = filter_var( $request['status'], FILTER_VALIDATE_BOOLEAN );
 
 			if ( $request['status'] ) {
