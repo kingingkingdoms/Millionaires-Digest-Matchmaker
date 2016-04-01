@@ -154,7 +154,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 				),
 
-				'is-active' => array(
+				'status' => array(
 					'context'     => array( 'edit' ),
 					'description' => __( 'Whether the object has been activated in WordPress or not.' ),
 					'readonly'    => true,
@@ -236,9 +236,9 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		foreach ( $all_plugins as $type => $_plugins ) {
 			foreach ( $_plugins as $id => $plugin ) {
-				$plugin['id']        = $this->get_plugin_id( $id );
-				$plugin['type']      = 'plugin';
-				$plugin['is-active'] = is_plugin_active( $id );
+				$plugin['id']     = $this->get_plugin_id( $id );
+				$plugin['type']   = 'plugin';
+				$plugin['status'] = is_plugin_active( $id );
 
 				if ( $type === 'dropin' || $type === 'mustuse' ) {
 					$plugin['type'] = $type;
@@ -267,7 +267,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			'author-link'     => esc_url_raw( $plugin['AuthorURI'] ),
 			'description'     => wp_strip_all_tags( $plugin['Description'] ),
 			'id'              => wp_strip_all_tags( $plugin['id'] ),
-			'is-active'       => (bool) $plugin['is-active'],
+			'status'          => (bool) $plugin['status'],
 			'link'            => esc_url_raw( $plugin['PluginURI'] ),
 			'name'            => wp_strip_all_tags( $plugin['Name'] ),
 			'network-only'    => (bool) $plugin['Network'],
