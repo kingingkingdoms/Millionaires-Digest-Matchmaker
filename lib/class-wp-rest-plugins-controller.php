@@ -157,7 +157,6 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				'status' => array(
 					'context'     => array( 'edit' ),
 					'description' => __( 'Whether the object has been activated in WordPress or not.' ),
-					'readonly'    => true,
 					'type'        => 'boolean',
 				)
 			)
@@ -214,13 +213,43 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_plugin_invalid_id', __( 'Invalid plugin ID.' ), array( 'status' => 404 ) );
 		}
 
-		return $this->prepare_item_for_response( $plugins[ $request['id'] ], $request );
+		return rest_ensure_response(
+			$this->prepare_item_for_response( $plugins[ $request['id'] ], $request )
+		);
 	}
 
-
-	/*
-	 * Methods relating to "get" endpoints.
+	/**
+	 * Update a single plugin.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Return updated object.
 	 */
+	public function update_item( $request ) {
+		$plugins = $this->get_plugins();
+		if ( ! isset( $plugins[ $request['id'] ] ) ) {
+			return new WP_Error( 'rest_plugin_invalid_id', __( 'Invalid plugin ID.' ), array( 'status' => 400 ) );
+		}
+
+		$plugin = urldecode( $request['id'] ) . '.php';
+
+		if ( ! empty( $request['status'] ) ) {
+			$request['status'] = filter_var( $request['status'], FILTER_VALIDATE_BOOLEAN );
+
+			if ( $request['status'] ) {
+				$status = activate_plugin( $plugin );
+
+				if ( is_wp_error( $status ) ) {
+					return new WP_Error( 'rest_cannot_edit', __( 'The resource cannot be edited.' ), array( 'status' => 500 ) );
+				}
+
+			} else {
+				deactivate_plugins( $plugin, false, false );
+			}
+		}
+
+		// @todo: How to make a proper internal REST API request?
+		return $this->get_item( $request );
+	}
 
 	/**
 	 * Get all plugin data.
@@ -268,6 +297,16 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Check if a given request has access to update a plugin.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_Error|bool
+	 */
+	public function update_item_permissions_check( $request ) {
+		return $this->get_items_permissions_check( $request );
+	}
+
+	/**
 	 * Check if a given request has access to plugin information.
 	 *
 	 * @since 0.1.0
@@ -279,6 +318,8 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$can_read = true;
 
 		if ( $request['context'] === 'edit' ) {
+			$can_read = false;
+
 			if ( is_multisite() ) {
 				$can_read = current_user_can( 'manage_network_plugins' );
 			} else {
