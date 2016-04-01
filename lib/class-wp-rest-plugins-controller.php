@@ -96,7 +96,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				),
 
 				'version' => array(
-					'context'     => array( 'view', 'edit' ),
+					'context'     => array( 'edit' ),
 					'description' => __( 'The version of the object (x.y.z).' ),
 					'readonly'    => true,
 					'type'        => 'string',
@@ -133,21 +133,21 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				),
 
 				'textdomain-path' => array(
-					'context'     => array( 'view', 'edit' ),
+					'context'     => array( 'edit' ),
 					'description' => __( 'The relative path to the location containing the gettext translation files for the object.' ),
 					'readonly'    => true,
 					'type'        => 'string',
 				),
 
 				'network-only' => array(
-					'context'     => array( 'view', 'edit' ),
+					'context'     => array( 'edit' ),
 					'description' => __( 'Whether the object can only be activated on a per-network basis.' ),
 					'readonly'    => true,
 					'type'        => 'boolean',
 				),
 
 				'type' => array(
-					'context'     => array( 'view', 'edit' ),
+					'context'     => array( 'edit' ),
 					'description' => __( 'Activation type of the object.' ),
 					'enum'        => array( 'dropin', 'mustuse', 'plugin', ),
 					'readonly'    => true,
@@ -155,7 +155,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				),
 
 				'is-active' => array(
-					'context'     => array( 'view', 'edit' ),
+					'context'     => array( 'edit' ),
 					'description' => __( 'Whether the object has been activated in WordPress or not.' ),
 					'enum'        => array( 'dropin', 'mustuse', 'plugin', ),
 					'readonly'    => true,
@@ -317,15 +317,25 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return false;
+		$can_read = true;
+
+		if ( $request['context'] === 'edit' ) {
+			if ( is_multisite() ) {
+				$can_read = current_user_can( 'manage_network_plugins' );
+			} else {
+				$can_read = current_user_can( 'activate_plugins' );
+			}
 		}
 
-		if ( is_multisite() && ! current_user_can( 'manage_network_plugins' ) ) {
-			return false;
+		if ( ! $can_read ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you cannot view this resource with edit context.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
 		}
 
-		return true;
+		return $can_read;
 	}
 
 	/**
