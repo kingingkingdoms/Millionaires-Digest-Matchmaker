@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP REST API - Plugin Endpoints
- * Description: Plugin endpoints for the WP REST API
+ * Description: Plugin endpoints for WordPress' REST API.
  * Author: Paul Gibbs
  * Author URI: http://byotos.com/
  * Version: 0.1.0
