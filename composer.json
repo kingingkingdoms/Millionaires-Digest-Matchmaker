@@ -1,0 +1,16 @@
+{
+  "name" : "paulgibbs/rest-api-plugins",
+  "description" : "Plugin endpoints for WordPress' REST API.",
+  "license" : "GPL2+",
+  "type" : "wordpress-plugin",
+  "version" : "0.1.0",
+  "authors" : [
+    {
+      "name": "Paul Gibbs",
+      "homepage": "http://byotos.com/"
+    }
+  ],
+  "require": {
+    "composer/installers": "~1.0"
+  }
+}
