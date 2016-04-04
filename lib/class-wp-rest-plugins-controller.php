@@ -247,8 +247,14 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			}
 		}
 
-		// @todo: How to make a proper internal REST API request?
-		return $this->get_item( $request );
+		// Fetch and return the updated item.
+		$item_request = new WP_REST_Request(
+			'GET',
+			'/' . $this->namespace . '/' . $this->rest_base . '/' . $request['id']
+		);
+		$item_request->set_param( 'context', $request['context'] );
+
+		return rest_get_server()->dispatch( $item_request );
 	}
 
 	/**
