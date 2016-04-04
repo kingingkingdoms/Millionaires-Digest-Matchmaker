@@ -3,7 +3,7 @@
   "description" : "Plugin endpoints for WordPress' REST API.",
   "license" : "GPL2+",
   "type" : "wordpress-plugin",
-  "version" : "0.1.0",
+  "version" : "0.2.0",
   "authors" : [
     {
       "name": "Paul Gibbs",

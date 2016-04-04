@@ -4,7 +4,7 @@
  * Description: Plugin endpoints for WordPress' REST API.
  * Author: Paul Gibbs
  * Author URI: http://byotos.com/
- * Version: 0.1.0
+ * Version: 0.2.0
  * Plugin URI: https://github.com/paulgibbs/rest-api-plugins/
  * License: GPL2+
  */
