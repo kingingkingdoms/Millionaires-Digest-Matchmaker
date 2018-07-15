@@ -7,8 +7,7 @@ Author: K&L (Founder of the Millionaire's Digest)
 Author URI: https://millionairedigest.com/
 */
 
-  require_once('class-mp-bp-match.php');
-
-  if(class_exists('Mp_BP_Match')){
-       new Mp_BP_Match();
-  }
+require_once( 'class-mp-bp-match.php' );
+if( class_exists( 'Mp_BP_Match' ) ) {
+  new Mp_BP_Match();
+}
