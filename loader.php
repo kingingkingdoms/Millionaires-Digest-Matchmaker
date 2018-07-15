@@ -1,12 +1,11 @@
 <?php
-/**
- * Plugin Name: BuddyPress Matchmaking
- * Plugin URI: https://meshpros.com/
- * Description: Custom Plugin for BuddyPress profile matching
- * Author: Muhammad Kashif
- * Author URI: http://muhammadkashif.com/
- * Version: 1.1.5
- */
+/*
+Plugin Name: Millionaire's Digest Matchmaker  
+Description: Give users the ability to find friends and accounts based on their same passions and interests.
+Version: 1.0.0
+Author: K&L (Founder of the Millionaire's Digest)
+Author URI: https://millionairedigest.com/
+*/
 
   require_once('class-mp-bp-match.php');
 
