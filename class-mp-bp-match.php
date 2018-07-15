@@ -127,11 +127,11 @@ class Mp_BP_Match {
 								  function( response ) {
 						jQuery( '#user-'+uid ) . html( response );
 					}
-								 );
+						);
 				}
-												 );
+					);
 			}
-									  );
+				);
 		</script>
 	<?php
 	}
