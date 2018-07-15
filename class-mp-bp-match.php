@@ -1,35 +1,24 @@
 <?php
 class Mp_BP_Match {
-
-  function __construct(){
-
-      add_action('wp_enqueue_scripts', array($this, 'mp_load_scripts'), 10);
-      add_action('bp_include', array($this, 'mp_bp_match_init'), 100);
-
-   }
-
-  /**
-  * Load the matching stuff only if BuddyPress is active.
-  */
-  function mp_bp_match_init() {
-
-      require_once('src/class.settings-api.php');
-  		require_once('mp-settings.php');
-
-      new WeDevs_Settings_API_Match();
-
-      add_action('wp_footer', array($this, 'hmk_script'), 100);
-
-      add_action('bp_profile_header_meta', array($this, 'hmk_show_matching_percentage'), 10);
-      add_action('bp_directory_members_item', array($this, 'hmk_matching_percentage_button'), 10);
-
-      add_shortcode( 'mp_match_percentage', array($this, 'mp_match_percentage_function'));
-
-      add_action('wp_ajax_hmk_get_percentage', array($this, 'hmk_get_percentage_function'), 100);
-      add_action('wp_ajax_nopriv_hmk_get_percentage', array($this, 'hmk_get_percentage_function'), 100);
-
-
-   }
+	
+	function __construct() {
+		add_action( 'wp_enqueue_scripts', array( $this, 'mp_load_scripts' ), 10 );
+		add_action( 'bp_include', array( $this, 'mp_bp_match_init' ), 100 );
+	}
+	
+	/* Load the matching only if BuddyPress is active. */
+	function mp_bp_match_init() {
+		require_once('src/class.settings-api.php');
+		require_once('mp-settings.php');
+		new WeDevs_Settings_API_Match();
+		
+		add_action( 'wp_footer', array( $this, 'hmk_script' ), 100 );
+		add_action( 'bp_profile_header_meta', array( $this, 'hmk_show_matching_percentage'), 10 );
+		add_action( 'bp_directory_members_item', array( $this, 'hmk_matching_percentage_button' ), 200 );
+		add_shortcode('mp_match_percentage', array( $this, 'mp_match_percentage_function' ) );
+		add_action( 'wp_ajax_hmk_get_percentage', array( $this, 'hmk_get_percentage_function' ), 100 );
+		add_action( 'wp_ajax_nopriv_hmk_get_percentage', array( $this, 'hmk_get_percentage_function' ), 100 );
+	}
 
   /**
   * Add Shortcode
@@ -62,18 +51,17 @@ class Mp_BP_Match {
 
      die;
    }
-
-
-   function hmk_matching_percentage_button() {
-
-      $user_displayed_id =  bp_get_member_user_id();
-      $user_logged_in = get_current_user_id();
-
-      if($user_displayed_id == $user_logged_in) return;
-
-      echo "<div class='hmk-trigger-match'><div id='user-$user_displayed_id' class='hmk-get-percent generic-button'> Calculate Match</div></div>";
-
-   }
+	
+	function hmk_matching_percentage_button() {
+		$user_displayed_id =  bp_get_member_user_id();
+		$user_logged_in = get_current_user_id();
+		if( $user_displayed_id == $user_logged_in )
+			return;
+		if( ! bp_has_member_type( $user_displayed_id, 'brand' ) && ( ! bp_has_member_type( $user_displayed_id, 'organization' ) && ( ! bp_has_member_type( $user_displayed_id, 'famous-person' ) && ( ! bp_has_member_type( $user_displayed_id, 'government' ) && ( ! bp_has_member_type( $user_logged_in, 'brand' ) && ( ! bp_has_member_type( $user_logged_in, 'organization' ) && ( ! bp_has_member_type( $user_logged_in, 'famous-person' ) && ( ! bp_has_member_type( $user_logged_in, 'government' ) ) ) ) ) ) ) ) ) {
+			echo "<div class='hmk-trigger-match'><div id='user-$user_displayed_id' class='hmk-get-percent generic-button'> Calculate Match</div></div>";
+		}
+		return '';
+	}
 
   /**
   * Calculates the match percentage based on number of xprofile fields matched and their percentage value
@@ -134,8 +122,10 @@ class Mp_BP_Match {
   * gets the match percentage and draws circle.
   */
   function hmk_show_matching_percentage( ) {
-
-    if(bp_is_my_profile()) return;
+	  if( ! is_user_logged_in() )
+			return;
+	  if( bp_is_my_profile() )
+		  return false;
 
   	echo '<div class="c100 p'.$this->hmk_get_matching_percentage_number().' small hmk-percentage blue">
   		<span class="hmk-match-inside">Match</span>
