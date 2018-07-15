@@ -1,22 +1,23 @@
-=== WP REST API Plugins Endpoint ===
-Contributors: djpaul
-Tags: json, rest, api, rest-api
-Requires at least: 4.4
-Tested up to: 4.5-alpha
-Stable tag: 0.2.0
+=== Millionaire's Digest Matchmaker ===
+Contributors: K&L
+Tags: Millionaire's Digest, Matchmaker
+Requires at least: 4.5.7
+Tested up to: 4.9.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WP REST API companion plugin for plugin endpoints.
-
 == Description ==
 
-WP REST API companion plugin for plugin endpoints.
+Give users the ability to find friends and accounts (such as brands, famous people, organizations, etc.) based on the same passions and interests with special thanks and all credits going to Muhammad Kashif for the original plugin.
+
+== Installation ==
+
+1. Visit Dashboard-> Plugins-> Add New
+2. Install plugin
+3. Activate
 
 == Changelog ==
 
-= 0.2.0 =
-* Fixed some internal "todos".
-
-= 0.1.0 =
-* Initial release.
+= 1.0.0 =
+* Initial release
