@@ -1,11 +1,9 @@
 <?php
-
 /**
  * WordPress settings API
  *
  *
  */
-
 if ( ! class_exists( 'WeDevs_Settings_API_Match' ) ):
 class WeDevs_Settings_API_Match {
 	private $settings_api;
@@ -24,8 +22,9 @@ class WeDevs_Settings_API_Match {
 		$this->settings_api->admin_init();
 	}
 	
+	/* Add the "Matchmaker" Settings Page to the Wp-Admin Menu  Under the "Settings" Tab */
 	function admin_menu() {
-		add_options_page( 'Matchmaker', 'wedevs', 'delete_posts', 'mp_bp_match', array( $this, 'plugin_page' ) );
+		add_options_page( 'Matchmaker', 'wedevs', 'manage_options', 'mp_bp_match', array( $this, 'plugin_page' ) );
 	}
 	
 	function get_settings_sections() {
