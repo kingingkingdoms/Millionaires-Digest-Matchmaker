@@ -162,7 +162,7 @@ class Mp_BP_Match {
               uid    = uid.split('-');
               uid    = uid[1];
 
-              jQuery('#user-'+uid).html('Please wait..');
+              jQuery('#user-'+uid).html('Please wait...');
 
               jQuery.post( ajaxurl, {
                 action: 'hmk_get_percentage',
