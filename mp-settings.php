@@ -28,7 +28,7 @@ class WeDevs_Settings_API_Match {
     }
 
     function admin_menu() {
-        add_options_page( 'Matchmaker', 'Matchmaker', 'manage_options', 'mp_bp_match', array($this, 'plugin_page') );
+        add_options_page( 'Matchmaker Settings', 'Matchmaker', 'manage_options', 'mp_bp_match', array($this, 'plugin_page') );
     }
 
     function get_settings_sections() {
