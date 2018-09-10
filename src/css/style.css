@@ -80,12 +80,14 @@
 
 .hmk-get-percent {
 	font-size: 12px;
-	background: rgba(236, 236, 236, 0.42);
+	background: transparent;
+	border-radius: 4px;
 	padding: 4px 9px;
 	display: inline-block;
-	border: 1px solid #ccc;
+	border: 1px solid #e5e5e5;
 	cursor: pointer;
 	margin-top: 6px;
+	text-transform: uppercase;
 }
 
 .rect-auto,
