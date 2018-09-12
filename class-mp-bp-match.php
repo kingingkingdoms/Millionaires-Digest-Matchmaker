@@ -96,7 +96,8 @@ class Mp_BP_Match {
 	
 	/* Gets the match percentage and draws circle. */
 	function hmk_show_matching_percentage( ) {
-		if(bp_is_my_profile()) return;
+		if( bp_is_user() )
+			return;
 		echo '<div class="c100 p'.$this->hmk_get_matching_percentage_number().' small hmk-percentage blue">
 		<span class="hmk-match-inside">Match</span>
 		<span>'.$this->hmk_get_matching_percentage_number().'%</span>
