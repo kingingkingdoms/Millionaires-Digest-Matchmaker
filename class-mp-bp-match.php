@@ -46,7 +46,7 @@ class Mp_BP_Match {
 		$user_logged_in = get_current_user_id();
 		if( $user_displayed_id == $user_logged_in )
 			return;
-		if( ! bp_has_member_type( $user_displayed_id, 'brand' ) && ( ! bp_has_member_type( $user_displayed_id, 'organization' ) && ( ! bp_has_member_type( $user_displayed_id, 'famous-person' )  && ( ! bp_has_member_type( $user_displayed_id, 'millionaires-digest' ) && ( ! bp_has_member_type( $user_displayed_id, 'government' ) && ( ! bp_has_member_type( $user_logged_in, 'brand' ) && ( ! bp_has_member_type( $user_logged_in, 'organization' ) && ( ! bp_has_member_type( $user_logged_in, 'famous-person' ) && ( ! bp_has_member_type( $user_logged_in, 'millionaires-digest' ) && ( ! bp_has_member_type( $user_logged_in, 'government' ) ) ) ) ) ) ) ) ) ) ) {
+		if( ! bp_has_member_type( $user_displayed_id, 'brand' ) && ( ! bp_has_member_type( $user_displayed_id, 'organization' ) && ( ! bp_has_member_type( $user_displayed_id, 'famous_person' )  && ( ! bp_has_member_type( $user_displayed_id, 'millionaires_digest' ) && ( ! bp_has_member_type( $user_displayed_id, 'government' ) && ( ! bp_has_member_type( $user_logged_in, 'brand' ) && ( ! bp_has_member_type( $user_logged_in, 'organization' ) && ( ! bp_has_member_type( $user_logged_in, 'famous_person' ) && ( ! bp_has_member_type( $user_logged_in, 'millionaires_digest' ) && ( ! bp_has_member_type( $user_logged_in, 'government' ) ) ) ) ) ) ) ) ) ) ) {
 			echo "<div class='hmk-trigger-match'><div id='user-$user_displayed_id' class='hmk-get-percent generic-button'>Calculate Match</div></div>";
 		}
 		return '';
